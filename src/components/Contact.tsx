@@ -49,10 +49,10 @@ export const Contact: React.FC = () => {
         </div>
 
         <a
-          href="mailto:nithinselvaraj9@gmail.com"
+          href="mailto:devstudionvk@gmail.com"
           className="group block font-display font-black text-[8vw] sm:text-5xl md:text-6xl tracking-tight break-all sm:break-normal text-paper hover:text-accent transition-colors duration-300 mb-20 md:mb-28"
         >
-          nithinselvaraj9@gmail.com
+          devstudionvk@gmail.com
         </a>
 
         <div ref={rowRef} className="flex flex-wrap items-center gap-x-16 gap-y-10 border-t border-white/10 pt-10">

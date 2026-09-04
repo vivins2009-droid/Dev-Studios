@@ -6,6 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { PROJECTS, Project } from './data/projects';
 import { SideNav } from './components/SideNav';
 import { Hero } from './components/Hero';
+import { Highlights } from './components/Highlights';
 import { Projects } from './components/Projects';
 import { About } from './components/About';
 import { Contact } from './components/Contact';
@@ -14,10 +15,15 @@ import { CustomCursor } from './components/CustomCursor';
 
 gsap.registerPlugin(ScrollTrigger);
 
+const HIGHLIGHT_IDS = ['buildit', 'library-assistant', 'lab-assistant'];
+
 export const App: React.FC = () => {
   const [activeSandboxProject, setActiveSandboxProject] = useState<Project | null>(null);
   const lenisRef = useRef<Lenis | null>(null);
   const maskRef = useRef<HTMLDivElement>(null);
+
+  const highlightProjects = PROJECTS.filter((p) => HIGHLIGHT_IDS.includes(p.id));
+  const remainingProjects = PROJECTS.filter((p) => !HIGHLIGHT_IDS.includes(p.id));
 
   useEffect(() => {
     const lenis = new Lenis({
@@ -85,8 +91,9 @@ export const App: React.FC = () => {
 
       <main className="pb-16 md:pb-0">
         <Hero />
-        <Projects projects={PROJECTS} onOpenSandbox={(p) => setActiveSandboxProject(p)} />
+        <Highlights projects={highlightProjects} onOpenSandbox={(p) => setActiveSandboxProject(p)} />
         <About />
+        <Projects projects={remainingProjects} onOpenSandbox={(p) => setActiveSandboxProject(p)} />
         <Contact />
       </main>
 

@@ -1,8 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
-import { Maximize2 } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { Project } from '../data/projects';
-import { LazyLiveFrame } from './LazyLiveFrame';
 import { reveal3D, revealLines } from '../lib/motion';
 
 interface ProjectsProps {
@@ -13,17 +12,17 @@ interface ProjectsProps {
 export const Projects: React.FC<ProjectsProps> = ({ projects, onOpenSandbox }) => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLDivElement>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
       revealLines(headingRef.current, { y: 70, stagger: 0.08 });
-      if (gridRef.current) {
-        reveal3D(gridRef.current.children, gridRef.current, {
-          rotateX: 6,
-          y: 24,
-          stagger: 0.05,
-          start: 'top 92%'
+      if (listRef.current) {
+        reveal3D(listRef.current.children, listRef.current, {
+          rotateX: 5,
+          y: 18,
+          stagger: 0.04,
+          start: 'top 90%'
         });
       }
     }, sectionRef);
@@ -31,48 +30,41 @@ export const Projects: React.FC<ProjectsProps> = ({ projects, onOpenSandbox }) =
   }, [projects]);
 
   return (
-    <section
-      ref={sectionRef}
-      id="projects"
-      className="relative py-28 md:py-36 md:pl-20 select-none"
-    >
+    <section ref={sectionRef} id="projects" className="relative py-28 md:py-36 md:pl-20 select-none">
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         <div ref={headingRef} className="mb-14 md:mb-20">
           <div className="overflow-hidden">
             <span className="block text-[10px] font-mono tracking-widest text-accent uppercase mb-3">
-              01 — {projects.length}
+              {projects[0]?.num} — {projects[projects.length - 1]?.num}
             </span>
           </div>
           <div className="overflow-hidden">
             <h2 className="font-display font-black text-[13vw] sm:text-6xl md:text-7xl uppercase tracking-tight leading-[0.9]">
-              Projects
+              More Work
             </h2>
           </div>
         </div>
 
-        <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+        <div ref={listRef} className="border-t border-white/10">
           {projects.map((project) => (
             <button
               key={project.id}
               onClick={() => onOpenSandbox(project)}
-              className="reveal-3d group text-left bg-ink-800 rounded-3xl p-3 border border-white/8 hover:border-accent/50 shadow-lg hover:shadow-[0_0_35px_-12px_rgba(147,175,168,0.3)] transition-all duration-300 cursor-pointer"
+              className="reveal-3d group w-full flex items-center justify-between gap-4 py-5 sm:py-6 border-b border-white/10 hover:border-accent/40 transition-colors cursor-pointer text-left"
             >
-              <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-ink-900">
-                <LazyLiveFrame src={project.liveUrl} title={project.name} />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/45 transition-colors duration-300 flex items-center justify-center">
-                  <Maximize2 className="w-5 h-5 text-paper opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </div>
-                <span className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-full bg-black/70 text-paper text-[9px] font-mono tracking-wider backdrop-blur-sm">
+              <div className="flex items-baseline gap-4 sm:gap-8 min-w-0">
+                <span className="shrink-0 text-xs sm:text-sm font-mono text-paper-faint">
                   {project.num}
                 </span>
-              </div>
-              <div className="flex items-center justify-between px-2 pt-3 pb-1.5">
-                <h3 className="font-display font-semibold text-base group-hover:text-accent transition-colors truncate mr-2">
+                <span className="font-display font-bold text-xl sm:text-3xl md:text-4xl tracking-tight truncate group-hover:text-accent transition-colors">
                   {project.name}
-                </h3>
-                <span className="shrink-0 text-[9px] font-mono tracking-wider text-paper-faint uppercase">
-                  {project.category.split(' ')[0]}
                 </span>
+              </div>
+              <div className="flex items-center gap-4 sm:gap-6 shrink-0">
+                <span className="hidden sm:inline text-[10px] font-mono tracking-widest text-paper-faint uppercase">
+                  {project.category}
+                </span>
+                <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5 text-paper-faint group-hover:text-accent group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-300" />
               </div>
             </button>
           ))}
