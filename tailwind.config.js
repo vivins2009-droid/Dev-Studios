@@ -11,6 +11,7 @@ export default {
         sans: ['"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
         display: ['"Space Grotesk"', '"Inter"', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
+        accent: ['"Instrument Serif"', 'serif'],
       },
       colors: {
         ink: {
