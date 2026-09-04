@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html.lenis, html.lenis body {
+    height: auto;
+  }
+
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
+  .lenis.lenis-smooth iframe {
+    pointer-events: none;
+  }
+
+  ::selection {
+    background-color: #93AFA8;
+    color: #08080A;
+  }
+
+  body {
+    background-color: #08080A;
+  }
+}
+
+/* Custom styling for sleek typography and borders */
+.font-display {
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.font-mono-code {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.text-stroke {
+  -webkit-text-stroke: 1px currentColor;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-stroke-thick {
+  -webkit-text-stroke: 2px currentColor;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Hide scrollbar for horizontal containers */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Smooth glass effect */
+.glass-panel-dark {
+  background: rgba(11, 11, 13, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Performance optimization: Disable pointer-events and heavy recalculations during active scroll */
+body.is-scrolling iframe {
+  pointer-events: none !important;
+}
+
+body.is-scrolling * {
+  user-select: none;
+}
+
+/* Muted single-tone accent glow, used sparingly */
+.glow-accent {
+  box-shadow: 0 0 40px -12px rgba(147, 175, 168, 0.28);
+}
+
+/* Elements animated by reveal3D need a stable 3D rendering context */
+.reveal-3d {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+  }
+}
