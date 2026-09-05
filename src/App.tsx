@@ -15,7 +15,7 @@ import { CustomCursor } from './components/CustomCursor';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const HIGHLIGHT_IDS = ['buildit', 'library-assistant', 'lab-assistant'];
+const HIGHLIGHT_IDS = ['buildit', 'library-assistant', 'mental-wellbeing'];
 
 export const App: React.FC = () => {
   const [activeSandboxProject, setActiveSandboxProject] = useState<Project | null>(null);
@@ -62,6 +62,29 @@ export const App: React.FC = () => {
       lenis.destroy();
     };
   }, []);
+
+  // While the sandbox modal is open, the page behind it must not scroll —
+  // otherwise Lenis keeps hijacking wheel input meant for the embedded
+  // iframe (fighting it every tick) and the background page's own
+  // `is-scrolling` class intermittently disables pointer-events on ALL
+  // iframes, including the one inside the modal. Both together are what
+  // reads as "lag" while scrolling a preview.
+  useEffect(() => {
+    const lenis = lenisRef.current;
+    if (!lenis) return;
+
+    if (activeSandboxProject) {
+      lenis.stop();
+      document.body.style.overflow = 'hidden';
+    } else {
+      lenis.start();
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [activeSandboxProject]);
 
   // Sidebar navigation: short hops scroll smoothly; long jumps get masked
   // with a brief cover/reveal so the traversal never reads as "lag".

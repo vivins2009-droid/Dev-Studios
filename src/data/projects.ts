@@ -15,6 +15,10 @@ export interface Project {
   badge?: string;
   rating: number;
   previewImage: string;
+  /** True if navigating inside the embedded sandbox can hit a real login/signup wall. */
+  authGated?: boolean;
+  /** True only for projects with a real responsive/tablet/mobile layout to preview. */
+  supportsResponsivePreview?: boolean;
 }
 
 export const PROJECTS: Project[] = [
@@ -104,21 +108,22 @@ export const PROJECTS: Project[] = [
     num: '05',
     name: 'Mental Well-Being Platform',
     builder: 'Vivin .S',
-    category: 'AI & Systems',
+    category: 'WebGL & 3D',
     domain: 'Mental Health & Wellness',
-    liveUrl: 'https://github.com/vivins2009-droid/Mental-well-being-website',
+    liveUrl: 'https://mental-well-being-website.vercel.app/',
     githubUrl: 'https://github.com/vivins2009-droid/Mental-well-being-website',
     highlights: [
-      'Interactive emotional self-care & mood check-in engine',
-      'Guided mindfulness exercises & cognitive reflection tools',
-      'Ambient soothing sensory visual interface',
+      'Goal decomposition into 5-15 minute daily micro-steps',
+      '3D dashboard with habit streaks & reflection log',
+      'Date-smart habit scheduling & rewards/level system',
       'Engineered by Vivin .S with modern web architecture'
     ],
-    description: 'Comprehensive mental health and emotional well-being application engineered by Vivin .S offering intuitive reflection prompts, calming interactive modules, and guided mindfulness tools.',
+    description: 'A personal goal-builder and habit tracker engineered by Vivin .S — breaks down big ambitions into mindful daily micro-steps inside a 3D productivity interface.',
     featured: true,
     badge: 'Vivin .S',
     rating: 5.0,
-    previewImage: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1200&q=85'
+    previewImage: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1200&q=85',
+    authGated: true
   },
   {
     id: 'mission-control',

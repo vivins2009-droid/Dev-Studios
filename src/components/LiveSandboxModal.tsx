@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Project } from '../data/projects';
 import {
   X,
@@ -11,7 +11,9 @@ import {
   Monitor,
   ShieldCheck,
   Terminal,
-  Layers
+  Layers,
+  LogIn,
+  Lock
 } from 'lucide-react';
 
 interface LiveSandboxModalProps {
@@ -29,6 +31,18 @@ export const LiveSandboxModal: React.FC<LiveSandboxModalProps> = ({
   const [reloadKey, setReloadKey] = useState(0);
   const [copied, setCopied] = useState(false);
   const [showSpecs, setShowSpecs] = useState(false);
+  const [showAuthWall, setShowAuthWall] = useState(false);
+  const loadCountRef = useRef(0);
+
+  // Reset per-project view state whenever a different project opens, or
+  // the frame is manually reloaded/reset — otherwise a leftover "mobile"
+  // device choice from a previous project could apply to one that has no
+  // switcher UI to change it back.
+  useEffect(() => {
+    loadCountRef.current = 0;
+    setShowAuthWall(false);
+    setDevice('desktop');
+  }, [project?.id, reloadKey]);
 
   if (!project) return null;
 
@@ -36,6 +50,23 @@ export const LiveSandboxModal: React.FC<LiveSandboxModalProps> = ({
     navigator.clipboard.writeText(project.liveUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  // We can't reach into a cross-origin iframe to block a specific button,
+  // but a `load` event fires for every navigation inside it — so the
+  // *second* load (the first is the initial mount) means the visitor
+  // clicked through to something else, e.g. a login wall. Catch that and
+  // hand back a graceful notice instead of leaving them on a foreign
+  // sign-in form with no way back.
+  const handleIframeLoad = () => {
+    loadCountRef.current += 1;
+    if (project.authGated && loadCountRef.current > 1) {
+      setShowAuthWall(true);
+    }
+  };
+
+  const handleResetPreview = () => {
+    setReloadKey((k) => k + 1);
   };
 
   const getContainerWidth = () => {
@@ -51,6 +82,7 @@ export const LiveSandboxModal: React.FC<LiveSandboxModalProps> = ({
 
   return (
     <div
+      data-lenis-prevent
       className="fixed inset-0 z-50 overflow-hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200"
       onClick={onClose}
     >
@@ -76,55 +108,60 @@ export const LiveSandboxModal: React.FC<LiveSandboxModalProps> = ({
 
             <div className="h-4 w-[1px] bg-white/20 hidden sm:block" />
 
-            <div className="hidden sm:flex items-center space-x-2">
-              <span className="text-xs font-mono font-bold text-paper tracking-wider">
-                {project.num} // {project.name}
+            <div className="hidden sm:flex items-center gap-2">
+              <span className="font-display font-semibold text-sm text-paper">
+                {project.name}
               </span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/10 text-paper/70">
+              <span className="text-[10px] font-mono text-paper-faint">
+                {project.num}
+              </span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/5 text-paper-faint">
                 {project.domain}
               </span>
             </div>
           </div>
 
-          {/* Center: Interactive Device Viewport Switcher */}
-          <div className="flex items-center space-x-1 bg-black/50 p-1 rounded-full border border-white/10 text-xs font-mono">
-            <button
-              onClick={() => setDevice('desktop')}
-              className={`flex items-center space-x-1.5 px-3 py-1 rounded-full transition-all ${
-                device === 'desktop'
-                  ? 'bg-paper text-ink-950 font-semibold'
-                  : 'text-paper/60 hover:text-paper'
-              }`}
-              title="Desktop 100% View"
-            >
-              <Monitor className="w-3.5 h-3.5" />
-              <span className="hidden md:inline">Desktop</span>
-            </button>
-            <button
-              onClick={() => setDevice('tablet')}
-              className={`flex items-center space-x-1.5 px-3 py-1 rounded-full transition-all ${
-                device === 'tablet'
-                  ? 'bg-paper text-ink-950 font-semibold'
-                  : 'text-paper/60 hover:text-paper'
-              }`}
-              title="Tablet 768px View"
-            >
-              <Tablet className="w-3.5 h-3.5" />
-              <span className="hidden md:inline">Tablet</span>
-            </button>
-            <button
-              onClick={() => setDevice('mobile')}
-              className={`flex items-center space-x-1.5 px-3 py-1 rounded-full transition-all ${
-                device === 'mobile'
-                  ? 'bg-paper text-ink-950 font-semibold'
-                  : 'text-paper/60 hover:text-paper'
-              }`}
-              title="Mobile 390px View"
-            >
-              <Smartphone className="w-3.5 h-3.5" />
-              <span className="hidden md:inline">Mobile</span>
-            </button>
-          </div>
+          {/* Center: Device Viewport Switcher — only for projects with a real responsive layout */}
+          {project.supportsResponsivePreview && (
+            <div className="flex items-center space-x-1 bg-black/50 p-1 rounded-full border border-white/10 text-xs font-mono">
+              <button
+                onClick={() => setDevice('desktop')}
+                className={`flex items-center space-x-1.5 px-3 py-1 rounded-full transition-all ${
+                  device === 'desktop'
+                    ? 'bg-paper text-ink-950 font-semibold'
+                    : 'text-paper/60 hover:text-paper'
+                }`}
+                title="Desktop 100% View"
+              >
+                <Monitor className="w-3.5 h-3.5" />
+                <span className="hidden md:inline">Desktop</span>
+              </button>
+              <button
+                onClick={() => setDevice('tablet')}
+                className={`flex items-center space-x-1.5 px-3 py-1 rounded-full transition-all ${
+                  device === 'tablet'
+                    ? 'bg-paper text-ink-950 font-semibold'
+                    : 'text-paper/60 hover:text-paper'
+                }`}
+                title="Tablet 768px View"
+              >
+                <Tablet className="w-3.5 h-3.5" />
+                <span className="hidden md:inline">Tablet</span>
+              </button>
+              <button
+                onClick={() => setDevice('mobile')}
+                className={`flex items-center space-x-1.5 px-3 py-1 rounded-full transition-all ${
+                  device === 'mobile'
+                    ? 'bg-paper text-ink-950 font-semibold'
+                    : 'text-paper/60 hover:text-paper'
+                }`}
+                title="Mobile 390px View"
+              >
+                <Smartphone className="w-3.5 h-3.5" />
+                <span className="hidden md:inline">Mobile</span>
+              </button>
+            </div>
+          )}
 
           {/* Right: Actions & External Links */}
           <div className="flex items-center space-x-2">
@@ -177,7 +214,7 @@ export const LiveSandboxModal: React.FC<LiveSandboxModalProps> = ({
         </div>
 
         {/* Live Active URL Navigation Sub-bar */}
-        <div className="bg-ink-700 px-4 py-2 border-b border-white/5 flex items-center justify-between text-xs font-mono text-paper/60">
+        <div className="bg-ink-700 px-4 py-2 border-b border-white/5 flex items-center text-xs font-mono text-paper/60">
           <div className="flex items-center space-x-2 truncate">
             <ShieldCheck className="w-3.5 h-3.5 text-accent shrink-0" />
             <span className="text-white/40">https://</span>
@@ -185,10 +222,15 @@ export const LiveSandboxModal: React.FC<LiveSandboxModalProps> = ({
               {project.liveUrl.replace('https://', '')}
             </span>
           </div>
-          <span className="text-[10px] text-accent uppercase tracking-wider font-bold hidden sm:inline">
-            ● 100% LIVE INTERACTIVE SANDBOX
-          </span>
         </div>
+
+        {/* Auth-gated notice: explore freely, but full features live behind a real account */}
+        {project.authGated && (
+          <div className="bg-accent/10 px-4 py-2 border-b border-accent/20 flex items-center gap-2 text-[11px] font-mono text-accent-bright">
+            <Lock className="w-3 h-3 shrink-0" />
+            <span>Explore freely — signing in isn't available here. An account is needed for the live features.</span>
+          </div>
+        )}
 
         {/* Sandbox Body (Iframe + Optional Specs Drawer) */}
         <div className="flex-1 relative flex items-center justify-center p-3 sm:p-6 bg-ink-950 overflow-hidden">
@@ -201,10 +243,34 @@ export const LiveSandboxModal: React.FC<LiveSandboxModalProps> = ({
               key={reloadKey}
               src={project.liveUrl}
               title={project.name}
+              onLoad={handleIframeLoad}
               className="w-full h-full border-0 bg-white"
               allow="accelerometer; camera; encrypted-media; geolocation; gyroscope; microphone; midi; payment; usb; xr-spatial-tracking"
               allowFullScreen
             />
+
+            {/* Graceful catch when a click inside the frame led to a login/signup wall */}
+            {showAuthWall && (
+              <div className="absolute inset-0 z-20 flex items-center justify-center bg-ink-950/90 backdrop-blur-md p-6 animate-in fade-in duration-200">
+                <div className="max-w-sm w-full text-center space-y-4">
+                  <div className="w-11 h-11 mx-auto rounded-full bg-accent/15 flex items-center justify-center">
+                    <LogIn className="w-5 h-5 text-accent" />
+                  </div>
+                  <h4 className="font-display font-bold text-lg text-paper">Account required</h4>
+                  <p className="text-xs font-mono text-paper/70 leading-relaxed">
+                    That action needs a real account on the live site. This embedded preview is read-only —
+                    sign-in isn't available here.
+                  </p>
+                  <button
+                    onClick={handleResetPreview}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-accent text-ink-950 text-xs font-mono font-bold tracking-wider uppercase hover:opacity-90 transition-opacity"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    Back to preview
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Technical Specifications Slide-Over Drawer */}

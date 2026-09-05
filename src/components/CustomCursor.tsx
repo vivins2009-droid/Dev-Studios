@@ -8,6 +8,7 @@ export const CustomCursor: React.FC = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [isOverFrame, setIsOverFrame] = useState(false);
 
   useEffect(() => {
     // Only activate custom cursor on devices with fine pointer (desktop mouse/trackpad)
@@ -47,6 +48,14 @@ export const CustomCursor: React.FC = () => {
       const clickable = target.closest(
         'button, a, input, select, textarea, [role="button"], .cursor-pointer, iframe, .group'
       );
+
+      // Once the pointer crosses into an iframe, its mousemove events are
+      // captured by the iframe's own document — we never hear about them.
+      // Without this, the custom cursor freezes at the entry point for as
+      // long as the pointer stays inside. Hide it and let the real OS
+      // cursor take over; it reappears on the next mousemove back on the
+      // main page.
+      setIsOverFrame(target.tagName === 'IFRAME' || !!target.closest('iframe'));
 
       if (clickable) {
         setIsHovered(true);
@@ -99,7 +108,7 @@ export const CustomCursor: React.FC = () => {
   return (
     <div
       className={`fixed inset-0 pointer-events-none z-[99999] transition-opacity duration-300 ${
-        isVisible ? 'opacity-100' : 'opacity-0'
+        isVisible && !isOverFrame ? 'opacity-100' : 'opacity-0'
       } hidden md:block select-none`}
     >
       {/* Center Precise Dot */}

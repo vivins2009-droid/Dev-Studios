@@ -1,17 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Home, LayoutGrid, User, Mail, Github } from 'lucide-react';
+import { Home, LayoutGrid, User, Mail } from 'lucide-react';
 
 const NAV_ITEMS = [
   { id: 'home', label: 'Home', icon: Home },
   { id: 'projects', label: 'Projects', icon: LayoutGrid },
   { id: 'about', label: 'About', icon: User },
   { id: 'contact', label: 'Contact', icon: Mail }
-];
-
-const GITHUB_LINKS = [
-  { name: 'Nithin', url: 'https://github.com/Nithinfgs' },
-  { name: 'Kranti', url: 'https://github.com/Krtx-dev' },
-  { name: 'Vivin', url: 'https://github.com/vivins2009-droid' }
 ];
 
 interface SideNavProps {
@@ -56,19 +50,11 @@ export const SideNav: React.FC<SideNavProps> = ({ onNavigate }) => {
 
   return (
     <>
-      {/* Desktop rail */}
+      {/* Desktop rail — just the nav-dot connector, centered */}
       <nav
         aria-label="Primary"
-        className="hidden md:flex fixed left-0 top-0 bottom-0 z-40 w-20 flex-col items-center justify-between py-8 border-r border-white/8 bg-ink-950/60 backdrop-blur-sm"
+        className="hidden md:flex fixed left-0 top-0 bottom-0 z-40 w-20 flex-col items-center justify-center"
       >
-        <button
-          onClick={() => onNavigate('home')}
-          aria-label="Home"
-          className="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center font-display font-bold text-sm text-paper hover:border-accent hover:text-accent transition-colors cursor-pointer"
-        >
-          D
-        </button>
-
         <div className="relative flex flex-col items-center gap-9">
           <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-px bg-white/10" />
           <div
@@ -97,24 +83,6 @@ export const SideNav: React.FC<SideNavProps> = ({ onNavigate }) => {
             );
           })}
         </div>
-
-        <div className="flex flex-col items-center gap-6">
-          {GITHUB_LINKS.map((g) => (
-            <a
-              key={g.name}
-              href={g.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={g.name}
-              className="group relative text-paper-faint hover:text-accent transition-colors"
-            >
-              <Github className="w-4 h-4" />
-              <span className="pointer-events-none absolute left-7 top-1/2 -translate-y-1/2 whitespace-nowrap font-accent italic text-lg text-paper opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                {g.name}
-              </span>
-            </a>
-          ))}
-        </div>
       </nav>
 
       {/* Mobile bottom bar */}
@@ -137,11 +105,6 @@ export const SideNav: React.FC<SideNavProps> = ({ onNavigate }) => {
             </button>
           );
         })}
-        {GITHUB_LINKS.map((g) => (
-          <a key={g.name} href={g.url} target="_blank" rel="noopener noreferrer" aria-label={g.name} className="p-2">
-            <Github className="w-4 h-4 text-paper-faint" />
-          </a>
-        ))}
       </nav>
     </>
   );
