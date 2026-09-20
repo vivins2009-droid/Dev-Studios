@@ -69,6 +69,13 @@ export const About: React.FC = () => {
               Full ownership, always.
             </p>
           </div>
+          <div className="overflow-hidden">
+            <p className="mt-8 max-w-2xl text-sm sm:text-base leading-relaxed text-paper-dim">
+              DEV STUDIOS builds premium websites, custom software, private business dashboards,
+              internal tools and interactive web applications for teams that need fast, reliable
+              digital systems.
+            </p>
+          </div>
         </div>
 
         {/* Founders */}
